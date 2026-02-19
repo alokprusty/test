@@ -17,6 +17,7 @@
 }
 
 *{box-sizing:border-box}
+
 body{
   margin:0;
   min-height:100svh;
@@ -28,17 +29,47 @@ body{
   padding:16px;
 }
 
-/* Floating hearts */
-.hearts{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0;}
-.heart{position:absolute;bottom:-40px;opacity:.85;animation:floatUp linear forwards;}
-@keyframes floatUp{
- from{transform:translateY(0) scale(.8);opacity:.9;}
- to{transform:translateY(-110vh) scale(1.4);opacity:0;}
+/* Floating Hearts Layer */
+.hearts{
+  position:fixed;
+  inset:0;
+  overflow:hidden;
+  pointer-events:none;
+  z-index:0;
 }
 
-/* Card */
+.heart{
+  position:absolute;
+  bottom:-40px;
+  opacity:.75;
+  animation:floatUp linear forwards;
+  will-change:transform,opacity;
+}
+
+@keyframes floatUp{
+  from{
+    transform:translateY(0) scale(.8) rotate(0deg);
+    opacity:.9;
+  }
+  to{
+    transform:translateY(-110vh) scale(1.4) rotate(360deg);
+    opacity:0;
+  }
+}
+
+/* Confetti Canvas */
+#confettiCanvas{
+  position:fixed;
+  inset:0;
+  width:100vw;
+  height:100vh;
+  pointer-events:none;
+  z-index:5;
+}
+
 .card{
-  position:relative;z-index:10;
+  position:relative;
+  z-index:10;
   width:min(720px,92vw);
   padding:34px 26px;
   background:var(--card);
@@ -48,36 +79,88 @@ body{
   box-shadow:0 20px 70px rgba(0,0,0,.18);
 }
 
-h1{font-size:clamp(24px,5vw,38px);line-height:1.4}
-.story{font-size:16px;opacity:.85;margin-bottom:24px;line-height:1.6}
+h1{
+  font-size:clamp(24px,5vw,38px);
+  margin:12px 0 18px;
+  line-height:1.4;
+}
 
-/* Buttons */
-.button-zone{position:relative;width:min(520px,92%);height:150px;margin:0 auto;}
+.story{
+  font-size:16px;
+  opacity:.85;
+  margin-bottom:24px;
+  line-height:1.6;
+}
+
+.button-zone{
+  position:relative;
+  width:min(520px,92%);
+  height:150px;
+  margin:0 auto;
+  touch-action:none;
+}
+
 button{
-  position:absolute;top:50%;transform:translateY(-50%);
-  padding:14px 24px;font-size:16px;font-weight:800;border-radius:999px;border:none;
-  box-shadow:0 10px 24px rgba(0,0,0,.14);
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  padding:14px 24px;
+  font-size:16px;
+  font-weight:800;
+  border-radius:999px;
+  border:none;
   cursor:pointer;
-}
-#yesBtn{left:18%;background:var(--yes);color:#fff;}
-#noBtn{left:62%;background:#e5e7eb;}
-
-/* Result */
-.result{display:none;margin-top:20px;animation:pop .4s ease;}
-.result h2{font-size:clamp(26px,6vw,42px);}
-@keyframes pop{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}
-
-.loveGif{
-  width:min(260px,70vw);
-  margin-top:16px;
-  border-radius:18px;
-  box-shadow:0 10px 30px rgba(0,0,0,.2);
+  box-shadow:0 10px 24px rgba(0,0,0,.14);
+  user-select:none;
+  transition:transform .15s ease,background .15s ease;
 }
 
-/* Music hint */
-.musicHint{
-  position:fixed;bottom:14px;left:50%;transform:translateX(-50%);
-  font-size:12px;opacity:.7;background:#ffffffc9;padding:6px 12px;border-radius:999px;
+#yesBtn{
+  left:18%;
+  background:var(--yes);
+  color:#fff;
+}
+
+#yesBtn:active{
+  transform:translateY(-50%) scale(1.08);
+}
+
+#yesBtn:hover{
+  background:var(--yesHover);
+}
+
+#noBtn{
+  left:62%;
+  background:#e5e7eb;
+  color:#111827;
+}
+
+.hint{
+  margin-top:10px;
+  font-size:12px;
+  opacity:.7;
+}
+
+.result{
+  display:none;
+  margin-top:20px;
+  animation:pop .4s ease;
+}
+
+.result h2{
+  font-size:clamp(26px,6vw,42px);
+  margin:12px 0;
+}
+
+.result p{
+  font-size:16px;
+  margin-bottom:12px;
+  line-height:1.6;
+}
+
+@keyframes pop{
+  from{transform:scale(.95);opacity:0}
+  to{transform:scale(1);opacity:1}
 }
 </style>
 </head>
@@ -87,76 +170,168 @@ button{
 <div class="hearts" id="hearts"></div>
 <canvas id="confettiCanvas"></canvas>
 
-<audio id="bgMusic" loop preload="auto">
-  <source src="perfect.mp3" type="audio/mpeg">
-</audio>
-
-<div class="musicHint" id="musicHint">Tap anywhere ❤️</div>
-
 <main class="card">
 
-<h1>I didn’t plan to fall in love…<br>I just kept choosing you every day.</h1>
+<h1>
+I didn’t plan to fall in love… <br>
+I just kept choosing you every single day.
+</h1>
 
 <p class="story">
-You became my calm, my habit, my safe place.
-And now… I don’t want a life where you’re not in it.
+We started with simple conversations — no promises, no expectations.
+
+But slowly you became the person I tell everything to.
+My first call when something good happens.
+My comfort when things feel heavy.
+
+Between random jokes, late night talks,
+and caring about each other without saying it…
+
+you stopped being part of my life
+and became my home.
 </p>
 
 <section class="button-zone" id="zone">
-  <button id="yesBtn">Yes… always ❤️</button>
-  <button id="noBtn">No 🤭</button>
+  <button id="yesBtn">Yes… it’s always you ❤️</button>
+  <button id="noBtn">I need to think 🤭</button>
 </section>
 
+<div class="hint" id="hint">
+Careful… running away won’t work this time 😌
+</div>
+
 <section class="result" id="result">
-  <h2>Will you marry me? 💍</h2>
-  <img src="love.gif" class="loveGif" alt="love animation">
+  <h2>So here’s my promise 💍</h2>
+  <p>
+Not just loving you on the happy days,
+but on the silent days, the stressful days,
+and even on the days we don’t fully understand each other.
+
+I promise to stay.
+To listen.
+To grow with you.
+And to keep choosing you —
+again and again — forever.
+  </p>
+
+  <h2>Will you marry me?</h2>
 </section>
 
 </main>
 
 <script>
-/* MUSIC */
-const music=document.getElementById("bgMusic");
-const hint=document.getElementById("musicHint");
-let started=false;
-function startMusic(){
- if(started) return;
- started=true;
- music.volume=0.6;
- music.play().catch(()=>{});
- hint.remove();
-}
-document.addEventListener("pointerdown",startMusic,{once:true});
+/* Confetti Setup */
+const zone=document.getElementById("zone");
+const yesBtn=document.getElementById("yesBtn");
+const noBtn=document.getElementById("noBtn");
+const result=document.getElementById("result");
+const hint=document.getElementById("hint");
+const confettiCanvas=document.getElementById("confettiCanvas");
 
-/* HEARTS */
-const hearts=document.getElementById("hearts");
-let count=0;
-function createHeart(){
- if(count>18) return;
- const h=document.createElement("div");
- h.className="heart";
- h.innerHTML="💖";
- h.style.left=Math.random()*100+"vw";
- h.style.fontSize=(14+Math.random()*22)+"px";
- const dur=7+Math.random()*4;
- h.style.animationDuration=dur+"s";
- hearts.appendChild(h);
- count++;
- setTimeout(()=>{h.remove();count--},dur*1000);
+function resizeCanvas(){
+  const dpr=Math.max(1,window.devicePixelRatio||1);
+  confettiCanvas.width=Math.floor(window.innerWidth*dpr);
+  confettiCanvas.height=Math.floor(window.innerHeight*dpr);
 }
+resizeCanvas();
+window.addEventListener("resize",resizeCanvas);
+
+const confettiInstance=confetti.create(confettiCanvas,{resize:false,useWorker:true});
+
+function fireConfetti(){
+  confettiInstance({
+    particleCount:350,
+    spread:140,
+    startVelocity:65,
+    ticks:250,
+    origin:{x:0.5,y:0.6}
+  });
+}
+
+/* Floating Hearts (Mobile Optimized) */
+const heartsContainer=document.getElementById("hearts");
+let heartCount=0;
+const MAX_HEARTS=18;
+
+function createHeart(){
+  if(heartCount>=MAX_HEARTS) return;
+
+  const heart=document.createElement("div");
+  heart.className="heart";
+  heart.innerHTML="💖";
+
+  const size=14+Math.random()*22;
+  heart.style.left=Math.random()*100+"vw";
+  heart.style.fontSize=size+"px";
+
+  const duration=7+Math.random()*4;
+  heart.style.animationDuration=duration+"s";
+
+  heartsContainer.appendChild(heart);
+  heartCount++;
+
+  setTimeout(()=>{
+    heart.remove();
+    heartCount--;
+  },duration*1000);
+}
+
 setInterval(createHeart,800);
 
-/* YES CLICK */
-const yes=document.getElementById("yesBtn");
-const zone=document.getElementById("zone");
-const result=document.getElementById("result");
+/* No Button Movement */
+let yesScale=1;
+function growYes(){
+  yesScale=Math.min(2.3,yesScale+0.12);
+  yesBtn.style.transform=`translateY(-50%) scale(${yesScale})`;
+}
 
-yes.onclick=()=>{
- startMusic();
- zone.style.display="none";
- result.style.display="block";
- confetti({particleCount:350,spread:140,origin:{y:.6}});
-};
+function clamp(n,min,max){return Math.max(min,Math.min(max,n));}
+
+function moveNo(px,py){
+  const z=zone.getBoundingClientRect();
+  const b=noBtn.getBoundingClientRect();
+
+  let dx=(b.left+b.width/2)-px;
+  let dy=(b.top+b.height/2)-py;
+  let mag=Math.hypot(dx,dy)||1;
+  dx/=mag; dy/=mag;
+
+  let newLeft=(b.left-z.left)+dx*120;
+  let newTop=(b.top-z.top)+dx*120;
+
+  newLeft=clamp(newLeft,0,z.width-b.width);
+  newTop=clamp(newTop,0,z.height-b.height);
+
+  noBtn.style.left=newLeft+"px";
+  noBtn.style.top=newTop+"px";
+  noBtn.style.transform="none";
+
+  growYes();
+}
+
+zone.addEventListener("pointermove",e=>{
+  const b=noBtn.getBoundingClientRect();
+  const d=Math.hypot(
+    (b.left+b.width/2)-e.clientX,
+    (b.top+b.height/2)-e.clientY
+  );
+  if(d<130)moveNo(e.clientX,e.clientY);
+});
+
+noBtn.addEventListener("click",e=>e.preventDefault());
+
+/* YES CLICK */
+yesBtn.addEventListener("click",()=>{
+  zone.style.display="none";
+  hint.style.display="none";
+  result.style.display="block";
+  resizeCanvas();
+  fireConfetti();
+
+  setTimeout(()=>{
+    alert("You just unlocked lifetime subscription to Alok ❤️");
+  },1600);
+});
 </script>
 
 </body>
